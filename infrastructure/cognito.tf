@@ -2,6 +2,15 @@ resource "aws_cognito_user_pool" "user_pool" {
   name = "${var.project_name}-user-pool"
 
   # Define user pool settings, such as password policy, multi-factor authentication, etc.
+  username_attributes      = ["email"]
+  auto_verified_attributes = ["email"]
+
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
 }
 
 resource "aws_cognito_user_pool_domain" "domain" {
@@ -9,23 +18,15 @@ resource "aws_cognito_user_pool_domain" "domain" {
   user_pool_id = aws_cognito_user_pool.user_pool.id
 }
 
-resource "aws_cognito_user_pool_client" "user_client" {
+resource "aws_cognito_user_pool_client" "user_pool_client" {
   name         = "${var.project_name}-user-pool-client"
   user_pool_id = aws_cognito_user_pool.user_pool.id
 
-  # Define the settings for the user pool client
-  explicit_auth_flows = ["ADMIN_NO_SRP_AUTH"]
-
-  # Define the allowed OAuth flows and scopes for the user pool client
-  allowed_oauth_flows  = ["code"]
-  allowed_oauth_scopes = ["email", "openid"]
-
-  # Define the callback URLs and logout URLs for the user pool client
-  callback_urls = ["https://example.com/callback"]
-  logout_urls   = ["https://example.com/logout"]
-
-  # Enable the user pool client for the user pool UI
-  prevent_user_existence_errors = "ENABLED"
+  callback_urls                        = ["https://example.com"]
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["implicit"]
+  allowed_oauth_scopes                 = ["email", "openid"]
+  supported_identity_providers         = ["COGNITO"]
 }
 
 resource "aws_cognito_user_pool_ui_customization" "example" {
@@ -33,4 +34,8 @@ resource "aws_cognito_user_pool_ui_customization" "example" {
   image_file = filebase64("../images/logo.png")
 
   user_pool_id = aws_cognito_user_pool_domain.domain.user_pool_id
+}
+
+output "cognito_domain" {
+  value = "https://${aws_cognito_user_pool.user_pool.domain}.auth.ap-southeast-2.amazoncognito.com/"
 }

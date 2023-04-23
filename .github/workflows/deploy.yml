@@ -42,7 +42,7 @@ jobs:
       if: ${{ startsWith(github.event_path, 'infrastructure/')}}
       run: make run_apply
 
-    - name: Deploy Application Changes
-      id: deploy_app
-      if: ${{ startsWith(github.event_path, 'application/')}}
-      run: make deploy_app
+    # - name: Deploy Application Changes
+    #   id: deploy_app
+    #   if: ${{ startsWith(github.event_path, 'application/')}}
+    #   run: make deploy_app

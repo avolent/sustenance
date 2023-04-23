@@ -4,7 +4,7 @@ run_plan: zip init plan
 
 run_apply: init apply
 
-run_destroy_plan: init destroy_plan
+run_destroy_plan: zip init destroy_plan
 
 run_destroy_apply: init destroy_apply
 
@@ -25,7 +25,6 @@ zip: lambda_dependencies
 	rm -f lambda-layer.zip; cd lambda-layer; zip -r ../lambda-layer.zip ./*
 
 lambda_dependencies:
-	rm -f -R lambda-layer
 	pipenv run pip freeze > requirements.txt
 	pip install -r requirements.txt -t lambda-layer
 
